@@ -27,10 +27,8 @@ const checkFavorite = (result) => {
 };
 
 export const createRoutePointTemplate = (data) => {
-  console.log(data);
 
   const {eventDateStart, eventIcon, eventType, eventCity, eventTimeStart, eventTimeEnd, travelTime, eventPrice, eventOffer, isFavorite} = data;
-  console.log(eventOffer);
 
   return `<li class="trip-events__item">
     <div class="event">
