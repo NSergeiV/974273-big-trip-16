@@ -5,15 +5,19 @@ import {createFormEditPointTemplate} from './view/edit-point-view.js';
 import {createTripEventsListTemplate} from './view/trip-events-list-view.js';
 import {createRoutePointTemplate} from './view/route-point-view.js';
 import {renderTemplate, RenderPosition} from './utils/render.js';
+import {generateTask} from './mock/task.js';
+import {compare} from './utils/common.js';
 
-const TASK_COUNT = 3;
+const TASK_COUNT = 20;
+
+const tasks = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
 
 const headerMenu = document.querySelector('.trip-main');
 const buttonNewEvent = headerMenu.querySelector('.trip-main__event-add-btn');
 const tripEvents = document.querySelector('.trip-events');
 const titleTripEvents = tripEvents.querySelector('h2');
 
-renderTemplate(headerMenu, createTripInfoTemplate(), RenderPosition.AFTERBEGIN );
+renderTemplate(headerMenu, createTripInfoTemplate(tasks), RenderPosition.AFTERBEGIN );
 renderTemplate(buttonNewEvent, createTripMainControlsTemplate(), RenderPosition.BEFOREBEGIN);
 renderTemplate(titleTripEvents, createFormTripControlsTemplate(), RenderPosition.AFTEREND);
 
@@ -23,8 +27,8 @@ renderTemplate(formTripSort, createTripEventsListTemplate(), RenderPosition.AFTE
 
 const pointList = tripEvents.querySelector('.trip-events__list');
 
-for (let i = 0; i < TASK_COUNT; i++) {
-  renderTemplate(pointList, createRoutePointTemplate(), RenderPosition.AFTERBEGIN);
+for (let i = 1; i < TASK_COUNT; i++) {
+  renderTemplate(pointList, createRoutePointTemplate(tasks[i]), RenderPosition.BEFOREEND);
 }
 
-renderTemplate(pointList, createFormEditPointTemplate(), RenderPosition.AFTERBEGIN);
+renderTemplate(pointList, createFormEditPointTemplate(tasks[0]), RenderPosition.AFTERBEGIN);
