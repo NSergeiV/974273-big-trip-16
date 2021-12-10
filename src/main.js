@@ -1,10 +1,10 @@
 import {createTripInfoTemplate} from './view/trip-main-info-view.js';
-import {createTripMainControlsTemplate} from './view/trip-main-trip-controls-view.js';
+import TripMainControlsView from './view/trip-main-trip-controls-view.js';
 import {createFormTripControlsTemplate} from './view/form-trip-sort-trip-events-view.js';
 import {createFormEditPointTemplate} from './view/edit-point-view.js';
 import {createTripEventsListTemplate} from './view/trip-events-list-view.js';
 import {createRoutePointTemplate} from './view/route-point-view.js';
-import {renderTemplate, RenderPosition} from './utils/render.js';
+import {renderTemplate, RenderPosition, renderElement} from './utils/render.js';
 import {generateTask} from './mock/task.js';
 import {compare} from './utils/common.js';
 
@@ -18,7 +18,7 @@ const tripEvents = document.querySelector('.trip-events');
 const titleTripEvents = tripEvents.querySelector('h2');
 
 renderTemplate(headerMenu, createTripInfoTemplate(tasks), RenderPosition.AFTERBEGIN );
-renderTemplate(buttonNewEvent, createTripMainControlsTemplate(), RenderPosition.BEFOREBEGIN);
+renderElement(buttonNewEvent, new TripMainControlsView().element, RenderPosition.BEFOREBEGIN);
 renderTemplate(titleTripEvents, createFormTripControlsTemplate(), RenderPosition.AFTEREND);
 
 const formTripSort = tripEvents.querySelector('.trip-events__trip-sort');
