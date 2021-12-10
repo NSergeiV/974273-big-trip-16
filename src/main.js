@@ -1,10 +1,10 @@
-import {createTripInfoTemplate} from './view/trip-main-info-view.js';
+import TripInfoVeiw from './view/trip-main-info-view.js';
 import TripMainControlsView from './view/trip-main-trip-controls-view.js';
-import {createFormTripControlsTemplate} from './view/form-trip-sort-trip-events-view.js';
-import {createFormEditPointTemplate} from './view/edit-point-view.js';
-import {createTripEventsListTemplate} from './view/trip-events-list-view.js';
-import {createRoutePointTemplate} from './view/route-point-view.js';
-import {renderTemplate, RenderPosition, renderElement} from './utils/render.js';
+import FormTripControlsView from './view/form-trip-sort-trip-events-view.js';
+import FormEditPointView from './view/edit-point-view.js';
+import TripEventsListVeiw from './view/trip-events-list-view.js';
+import RoutePointView from './view/route-point-view.js';
+import {RenderPosition, render} from './utils/render.js';
 import {generateTask} from './mock/task.js';
 import {compare} from './utils/common.js';
 
@@ -17,18 +17,18 @@ const buttonNewEvent = headerMenu.querySelector('.trip-main__event-add-btn');
 const tripEvents = document.querySelector('.trip-events');
 const titleTripEvents = tripEvents.querySelector('h2');
 
-renderTemplate(headerMenu, createTripInfoTemplate(tasks), RenderPosition.AFTERBEGIN );
-renderElement(buttonNewEvent, new TripMainControlsView().element, RenderPosition.BEFOREBEGIN);
-renderTemplate(titleTripEvents, createFormTripControlsTemplate(), RenderPosition.AFTEREND);
+render(headerMenu, new TripInfoVeiw(tasks).element, RenderPosition.AFTERBEGIN );
+render(buttonNewEvent, new TripMainControlsView().element, RenderPosition.BEFOREBEGIN);
+render(titleTripEvents, new FormTripControlsView().element, RenderPosition.AFTEREND);
 
 const formTripSort = tripEvents.querySelector('.trip-events__trip-sort');
 
-renderTemplate(formTripSort, createTripEventsListTemplate(), RenderPosition.AFTEREND);
+render(formTripSort, new TripEventsListVeiw().element, RenderPosition.AFTEREND);
 
 const pointList = tripEvents.querySelector('.trip-events__list');
 
 for (let i = 1; i < TASK_COUNT; i++) {
-  renderTemplate(pointList, createRoutePointTemplate(tasks[i]), RenderPosition.BEFOREEND);
+  render(pointList, new RoutePointView(tasks[i]).element, RenderPosition.BEFOREEND);
 }
 
-renderTemplate(pointList, createFormEditPointTemplate(tasks[0]), RenderPosition.AFTERBEGIN);
+render(pointList, new FormEditPointView(tasks[0]).element, RenderPosition.AFTERBEGIN);

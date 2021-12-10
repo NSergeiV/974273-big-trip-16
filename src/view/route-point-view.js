@@ -1,3 +1,5 @@
+import {createElement} from '../utils/render.js';
+
 const offerTemplate = (offer, price) => (
   `<li class="event__offer">
       <span class="event__offer-title">${offer}</span>
@@ -64,3 +66,28 @@ export const createRoutePointTemplate = (data) => {
     </div>
   </li>`;
 };
+
+export default class RoutePointView {
+  #element = null;
+  #routePoints = null;
+
+  constructor(routePoints) {
+    this.#routePoints = routePoints;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createRoutePointTemplate(this.#routePoints);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

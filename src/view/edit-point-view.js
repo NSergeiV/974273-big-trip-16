@@ -1,3 +1,5 @@
+import {createElement} from '../utils/render.js';
+
 const createEventOffer = (offers) => (
   `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -34,7 +36,7 @@ const createEventDestination = (description, eventPhotos) => (
     </section>` : ' '}`
 );
 
-export const createFormEditPointTemplate = (data) => {
+const createFormEditPointTemplate = (data) => {
 
   const {eventIcon, eventType, eventOffer, description, eventPhoto} = data;
 
@@ -144,3 +146,24 @@ export const createFormEditPointTemplate = (data) => {
     </form>
   </li>`;
 };
+
+export default class FormEditPointView {
+  #element = null;
+  #routePoint = null;
+
+  constructor(routePoint) {
+    this.#routePoint = routePoint;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFormEditPointTemplate(this.#routePoint);
+  }
+}
