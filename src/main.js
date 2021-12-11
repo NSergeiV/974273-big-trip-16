@@ -3,6 +3,7 @@ import TripMainControlsView from './view/trip-main-trip-controls-view.js';
 import FormTripControlsView from './view/form-trip-sort-trip-events-view.js';
 import FormEditPointView from './view/edit-point-view.js';
 import TripEventsListVeiw from './view/trip-events-list-view.js';
+import TripEventsListComponentVeiw from './view/trip-events-list-component-view.js';
 import RoutePointView from './view/route-point-view.js';
 import {RenderPosition, render} from './utils/render.js';
 import {generateTask} from './mock/task.js';
@@ -22,13 +23,35 @@ render(buttonNewEvent, new TripMainControlsView().element, RenderPosition.BEFORE
 render(titleTripEvents, new FormTripControlsView().element, RenderPosition.AFTEREND);
 
 const formTripSort = tripEvents.querySelector('.trip-events__trip-sort');
+const pointList = new TripEventsListVeiw();
 
-render(formTripSort, new TripEventsListVeiw().element, RenderPosition.AFTEREND);
+render(formTripSort, pointList.element, RenderPosition.AFTEREND);
 
-const pointList = tripEvents.querySelector('.trip-events__list');
+const renderPoint = (pointListElement, point) => {
+  const pointListComponent = new TripEventsListComponentVeiw();
+  const pointComponent = new RoutePointView(point);
+  const pointEditComponent = new FormEditPointView(point);
 
-for (let i = 1; i < TASK_COUNT; i++) {
-  render(pointList, new RoutePointView(tasks[i]).element, RenderPosition.BEFOREEND);
-}
+  const replaceCardToForm = () => {
+    pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
+  };
 
-render(pointList, new FormEditPointView(tasks[0]).element, RenderPosition.AFTERBEGIN);
+  const replaceFormToCard = () => {
+    pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+  };
+
+  pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replaceCardToForm();
+  });
+
+  pointEditComponent.element.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    replaceFormToCard();
+  });
+
+
+  render(pointListComponent.element, pointComponent.element, RenderPosition.BEFOREEND);
+  render(pointListElement, pointListComponent.element, RenderPosition.BEFOREEND);
+};
+
+tasks.forEach((point) => renderPoint(pointList.element, point));
