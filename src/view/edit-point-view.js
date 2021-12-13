@@ -1,3 +1,5 @@
+import {createElement} from '../utils/render.js';
+
 const createEventOffer = (offers) => (
   `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -34,15 +36,14 @@ const createEventDestination = (description, eventPhotos) => (
     </section>` : ' '}`
 );
 
-export const createFormEditPointTemplate = (data) => {
+const createFormEditPointTemplate = (data) => {
 
-  const {eventIcon, eventType, eventOffer, description, eventPhoto} = data;
+  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice} = data;
 
   const repeatingOffer = createEventOffer(eventOffer);
   const destination = createEventDestination(description, eventPhoto);
 
-  return `<li class="trip-events__item">
-    <form class="event event--edit" action="#" method="post">
+  return `<form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -107,7 +108,7 @@ export const createFormEditPointTemplate = (data) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${eventType}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${eventCity} list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
             <option value="Geneva"></option>
@@ -128,7 +129,7 @@ export const createFormEditPointTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="160">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${eventPrice}>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -141,6 +142,26 @@ export const createFormEditPointTemplate = (data) => {
         ${repeatingOffer}
         ${destination}
       </section>
-    </form>
-  </li>`;
+    </form>`;
 };
+
+export default class FormEditPointView {
+  #element = null;
+  #routePoint = null;
+
+  constructor(routePoint) {
+    this.#routePoint = routePoint;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createFormEditPointTemplate(this.#routePoint);
+  }
+}

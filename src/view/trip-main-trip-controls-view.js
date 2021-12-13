@@ -1,4 +1,6 @@
-export const createTripMainControlsTemplate = () => (
+import {createElement} from '../utils/render.js';
+
+const createTripMainControlsTemplate = () => (
   `<div class="trip-main__trip-controls  trip-controls">
     <div class="trip-controls__navigation">
       <h2 class="visually-hidden">Switch trip view</h2>
@@ -31,3 +33,23 @@ export const createTripMainControlsTemplate = () => (
     </div>
   </div>`
 );
+
+export default class TripMainControlsView {
+  #element = null;
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createTripMainControlsTemplate();
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

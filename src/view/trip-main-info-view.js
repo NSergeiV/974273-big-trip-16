@@ -1,10 +1,12 @@
+import {createElement} from '../utils/render.js';
+
 const countPrice = (list) => {
   let summ = 0;
   list.forEach((item) => {summ += item.eventPrice;});
   return summ;
 };
 
-export const createTripInfoTemplate = (data) => {
+const createTripInfoTemplate = (data) => {
 
   const priceSumm = countPrice(data);
 
@@ -24,3 +26,28 @@ export const createTripInfoTemplate = (data) => {
       </p>
     </section>`;
 };
+
+export default class TripInfoVeiw {
+  #element = null;
+  #routePoints = null;
+
+  constructor(routePoints) {
+    this.#routePoints = routePoints;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createTripInfoTemplate(this.#routePoints);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

@@ -1,11 +1,11 @@
 import {createElement} from '../utils/render.js';
 
-const createTripEventsListTemplate = () => (
-  `<ul class="trip-events__list">
-  </ul>`
+const createTripEventsListComponentTemplate = () => (
+  `<li class="trip-events__item">
+  </li>`
 );
 
-export default class TripEventsListVeiw {
+export default class TripEventsListComponentVeiw {
   #element = null;
 
   get element() {
@@ -17,7 +17,7 @@ export default class TripEventsListVeiw {
   }
 
   get template() {
-    return createTripEventsListTemplate();
+    return createTripEventsListComponentTemplate();
   }
 
   removeElement() {
