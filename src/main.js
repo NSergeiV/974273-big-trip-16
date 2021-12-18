@@ -6,7 +6,7 @@ import TripEventsListVeiw from './view/trip-events-list-view.js';
 import TripEventsListComponentVeiw from './view/trip-events-list-component-view.js';
 import RoutePointView from './view/route-point-view.js';
 import ListEmptyView from './view/list-empty-view.js';
-import {RenderPosition, render} from './utils/render.js';
+import {RenderPosition, render, replace} from './utils/render.js';
 import {generateTask} from './mock/task.js';
 import {compare} from './utils/common.js';
 
@@ -22,19 +22,19 @@ const tripEvents = document.querySelector('.trip-events');
 const titleTripEvents = tripEvents.querySelector('h2');
 
 if (TASK_COUNT === 0) {
-  render(tripEvents, new ListEmptyView().element, RenderPosition.AFTERBEGIN);
+  render(tripEvents, new ListEmptyView(), RenderPosition.AFTERBEGIN);
 }
 
 if (TASK_COUNT !== 0) {
-  render(headerMenu, new TripInfoVeiw(tasks).element, RenderPosition.AFTERBEGIN);
-  render(titleTripEvents, new FormTripControlsView().element, RenderPosition.AFTEREND);
+  render(headerMenu, new TripInfoVeiw(tasks), RenderPosition.AFTERBEGIN);
+  render(titleTripEvents, new FormTripControlsView(), RenderPosition.AFTEREND);
 }
-render(buttonNewEvent, new TripMainControlsView().element, RenderPosition.BEFOREBEGIN);
+render(buttonNewEvent, new TripMainControlsView(), RenderPosition.BEFOREBEGIN);
 
 const formTripSort = tripEvents.querySelector('.trip-events__trip-sort');
 const pointList = new TripEventsListVeiw();
 
-render(formTripSort, pointList.element, RenderPosition.AFTEREND);
+render(formTripSort, pointList, RenderPosition.AFTEREND);
 
 const renderPoint = (pointListElement, point) => {
   const pointListComponent = new TripEventsListComponentVeiw();
@@ -42,13 +42,13 @@ const renderPoint = (pointListElement, point) => {
   const pointEditComponent = new FormEditPointView(point);
 
   const replaceCardToForm = () => {
-    pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
-
+    // pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
+    replace(pointEditComponent, pointComponent);
   };
 
   const replaceFormToCard = () => {
-    pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
-
+    // pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+    replace(pointComponent, pointEditComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -59,25 +59,24 @@ const renderPoint = (pointListElement, point) => {
     }
   };
 
-  pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointComponent.setEditClickHandler(() => {
     replaceCardToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointEditComponent.setFormClickHandler(() => {
     replaceFormToCard();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  pointEditComponent.element.addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  pointEditComponent.setFormSubmitHandler(() => {
     replaceFormToCard();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
 
-  render(pointListComponent.element, pointComponent.element, RenderPosition.BEFOREEND);
-  render(pointListElement, pointListComponent.element, RenderPosition.BEFOREEND);
+  render(pointListComponent.element, pointComponent, RenderPosition.BEFOREEND);
+  render(pointListElement, pointListComponent, RenderPosition.BEFOREEND);
 };
 
 tasks.forEach((point) => renderPoint(pointList.element, point));

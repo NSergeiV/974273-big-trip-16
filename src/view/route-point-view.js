@@ -77,4 +77,14 @@ export default class RoutePointView extends AbstractView {
   get template() {
     return createRoutePointTemplate(this.#routePoints);
   }
+
+  setEditClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClick);
+  }
+
+  #editClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  }
 }
