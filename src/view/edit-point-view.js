@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractView from './abstract-view.js';
 
 const createEventOffer = (offers) => (
   `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
@@ -145,23 +145,36 @@ const createFormEditPointTemplate = (data) => {
     </form>`;
 };
 
-export default class FormEditPointView {
-  #element = null;
+export default class FormEditPointView extends AbstractView {
+
   #routePoint = null;
 
   constructor(routePoint) {
+    super();
     this.#routePoint = routePoint;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createFormEditPointTemplate(this.#routePoint);
+  }
+
+  setFormClickHandler = (callback) => {
+    this._callback.formClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formHandler);
+  }
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+  }
+
+  #formHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formClick();
+  }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 }

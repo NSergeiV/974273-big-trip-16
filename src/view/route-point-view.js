@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractView from './abstract-view.js';
 
 const offerTemplate = (offer, price) => (
   `<li class="event__offer">
@@ -65,27 +65,26 @@ const createRoutePointTemplate = (data) => {
     </div>`;
 };
 
-export default class RoutePointView {
-  #element = null;
+export default class RoutePointView extends AbstractView {
+
   #routePoints = null;
 
   constructor(routePoints) {
+    super();
     this.#routePoints = routePoints;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createRoutePointTemplate(this.#routePoints);
   }
 
-  removeElement() {
-    this.#element = null;
+  setEditClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClick);
+  }
+
+  #editClick = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractView from './abstract-view.js';
 
 const countPrice = (list) => {
   let summ = 0;
@@ -27,27 +27,16 @@ const createTripInfoTemplate = (data) => {
     </section>`;
 };
 
-export default class TripInfoVeiw {
-  #element = null;
+export default class TripInfoVeiw extends AbstractView {
+
   #routePoints = null;
 
   constructor(routePoints) {
+    super();
     this.#routePoints = routePoints;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
   }
 
   get template() {
     return createTripInfoTemplate(this.#routePoints);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

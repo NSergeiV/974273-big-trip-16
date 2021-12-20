@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractView from './abstract-view.js';
 
 const createTripMainControlsTemplate = () => (
   `<div class="trip-main__trip-controls  trip-controls">
@@ -34,22 +34,9 @@ const createTripMainControlsTemplate = () => (
   </div>`
 );
 
-export default class TripMainControlsView {
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
+export default class TripMainControlsView extends AbstractView {
 
   get template() {
     return createTripMainControlsTemplate();
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
