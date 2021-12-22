@@ -1,3 +1,5 @@
+import TripPresenter from './presenter/trip-presenter.js';
+
 import TripInfoVeiw from './view/trip-main-info-view.js';
 import TripMainControlsView from './view/trip-main-trip-controls-view.js';
 import FormTripControlsView from './view/form-trip-sort-trip-events-view.js';
@@ -12,7 +14,17 @@ import {compare} from './utils/common.js';
 
 const TASK_COUNT = 20;
 
-const tasks = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
+const tripPoints = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
+
+// ---------------------
+/*
+const boardContainer = document.querySelector('.page-body');
+
+const tripPresenter = new TripPresenter(boardContainer);
+
+tripPresenter.init(tripPoints);
+*/
+// ---------------------
 
 const headerMenu = document.querySelector('.trip-main');
 const buttonNewEvent = headerMenu.querySelector('.trip-main__event-add-btn');
@@ -21,12 +33,12 @@ const tripEvents = document.querySelector('.trip-events');
 
 const titleTripEvents = tripEvents.querySelector('h2');
 
-if (TASK_COUNT === 0) {
+if (tripPoints.length === 0) {
   render(tripEvents, new ListEmptyView(), RenderPosition.AFTERBEGIN);
 }
 
-if (TASK_COUNT !== 0) {
-  render(headerMenu, new TripInfoVeiw(tasks), RenderPosition.AFTERBEGIN);
+if (tripPoints.length !== 0) {
+  render(headerMenu, new TripInfoVeiw(tripPoints), RenderPosition.AFTERBEGIN);
   render(titleTripEvents, new FormTripControlsView(), RenderPosition.AFTEREND);
 }
 render(buttonNewEvent, new TripMainControlsView(), RenderPosition.BEFOREBEGIN);
@@ -42,12 +54,10 @@ const renderPoint = (pointListElement, point) => {
   const pointEditComponent = new FormEditPointView(point);
 
   const replaceCardToForm = () => {
-    // pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
     replace(pointEditComponent, pointComponent);
   };
 
   const replaceFormToCard = () => {
-    // pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
     replace(pointComponent, pointEditComponent);
   };
 
@@ -79,4 +89,5 @@ const renderPoint = (pointListElement, point) => {
   render(pointListElement, pointListComponent, RenderPosition.BEFOREEND);
 };
 
-tasks.forEach((point) => renderPoint(pointList.element, point));
+tripPoints.forEach((point) => renderPoint(pointList.element, point));
+
