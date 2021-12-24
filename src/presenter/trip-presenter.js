@@ -1,6 +1,6 @@
-//import TripInfoVeiw from './view/trip-main-info-view.js';
-//import TripMainControlsView from './view/trip-main-trip-controls-view.js';
-//import FormTripControlsView from './view/form-trip-sort-trip-events-view.js';
+import TripInfoVeiw from '../view/trip-main-info-view.js';
+import TripMainTableStaticView from '../view/trip-main-trip-controls-view.js';
+import FormTripSortPointsView from '../view/form-trip-sort-trip-events-view.js';
 //import FormEditPointView from './view/edit-point-view.js';
 //import TripEventsListVeiw from './view/trip-events-list-view.js';
 //import TripEventsListComponentVeiw from './view/trip-events-list-component-view.js';
@@ -10,13 +10,16 @@ import {RenderPosition, render, replace} from '../utils/render.js';
 
 export default class TripPresenter {
   #boardContainer = null;
+  #boardPoints = [];
+  #headerMenu = null;
+  #buttonNewEvent = null;
 
   #ListEmptyView = new ListEmptyView();
 
-  #boardPoints = [];
-
   constructor(boardContainer) {
     this.#boardContainer = boardContainer;
+    this.#headerMenu = boardContainer.querySelector('.trip-main');
+    this.#buttonNewEvent = boardContainer.querySelector('.trip-main__event-add-btn');
   }
 
   init = (boardPoints) => {
@@ -26,19 +29,24 @@ export default class TripPresenter {
     }
 
     this.#renderTripInfo(this.#boardPoints);
-
-    const headerMenu = document.querySelector('.trip-main');
-    const buttonNewEvent = headerMenu.querySelector('.trip-main__event-add-btn');
-    const tripEvents = document.querySelector('.trip-events');
-    const titleTripEvents = tripEvents.querySelector('h2');
-
-    render(headerMenu, new TripInfoVeiw(tripPoints), RenderPosition.AFTERBEGIN);
-    render(titleTripEvents, new FormTripControlsView(), RenderPosition.AFTEREND);
+    this.#renderTripMainTableStatic();
+    this.#renderFormTripSortPoints();
   }
 
-  #renderTripMainTableStatic = () => {}
+  #renderTripMainTableStatic = () => {
+    render(this.#buttonNewEvent, new TripMainTableStaticView(), RenderPosition.BEFOREBEGIN);
+  }
 
-  #renderTripInfo = (dataPoints) => {}
+  #renderFormTripSortPoints = () => {
+    const tripEvents = this.#boardContainer.querySelector('.trip-events');
+    const titleTripEvents = tripEvents.querySelector('h2');
+
+    render(titleTripEvents, new FormTripSortPointsView(), RenderPosition.AFTEREND);
+  }
+
+  #renderTripInfo = (dataPoints) => {
+    render(this.#headerMenu, new TripInfoVeiw(dataPoints), RenderPosition.AFTERBEGIN);
+  }
 
   #renderNoTasks = () => {
     // Метод для рендеринга заглушки

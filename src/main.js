@@ -17,15 +17,15 @@ const TASK_COUNT = 20;
 const tripPoints = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
 
 // ---------------------
-/*
+
 const boardContainer = document.querySelector('.page-body');
 
 const tripPresenter = new TripPresenter(boardContainer);
 
 tripPresenter.init(tripPoints);
-*/
-// ---------------------
 
+// ---------------------
+/*
 const headerMenu = document.querySelector('.trip-main');
 const buttonNewEvent = headerMenu.querySelector('.trip-main__event-add-btn');
 const tripEvents = document.querySelector('.trip-events');
@@ -91,3 +91,4 @@ const renderPoint = (pointListElement, point) => {
 
 tripPoints.forEach((point) => renderPoint(pointList.element, point));
 
+*/
