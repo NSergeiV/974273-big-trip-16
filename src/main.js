@@ -1,14 +1,4 @@
 import TripPresenter from './presenter/trip-presenter.js';
-
-import TripInfoVeiw from './view/trip-main-info-view.js';
-import TripMainControlsView from './view/trip-main-trip-controls-view.js';
-import FormTripControlsView from './view/form-trip-sort-trip-events-view.js';
-import FormEditPointView from './view/edit-point-view.js';
-import TripEventsListVeiw from './view/trip-events-list-view.js';
-import TripEventsListComponentVeiw from './view/trip-events-list-component-view.js';
-import RoutePointView from './view/route-point-view.js';
-import ListEmptyView from './view/list-empty-view.js';
-import {RenderPosition, render, replace} from './utils/render.js';
 import {generateTask} from './mock/task.js';
 import {compare} from './utils/common.js';
 
