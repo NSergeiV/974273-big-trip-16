@@ -2,11 +2,12 @@ import TripInfoVeiw from '../view/trip-main-info-view.js';
 import TripMainTableStaticView from '../view/trip-main-trip-controls-view.js';
 import FormTripSortPointsView from '../view/form-trip-sort-trip-events-view.js';
 import TripEventsListVeiw from '../view/trip-events-list-view.js';
-import TripEventsListComponentVeiw from '../view/trip-events-list-component-view.js';
-import RoutePointView from '../view/route-point-view.js';
-import FormEditPointView from '../view/edit-point-view.js';
+// import TripEventsListComponentVeiw from '../view/trip-events-list-component-view.js';
+// import RoutePointView from '../view/route-point-view.js';
+// import FormEditPointView from '../view/edit-point-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import {RenderPosition, render, replace} from '../utils/render.js';
+import PointPresenter from './point-presenter.js';
 
 export default class TripPresenter {
   #boardContainer = null;
@@ -16,6 +17,8 @@ export default class TripPresenter {
   #tripEvents = null;
 
   #ListEmptyView = new ListEmptyView();
+  #pointList = new TripEventsListVeiw();
+  #PointPresenter = new PointPresenter(this.#pointList);
 
   constructor(boardContainer) {
     this.#boardContainer = boardContainer;
@@ -41,7 +44,6 @@ export default class TripPresenter {
   }
 
   #renderFormTripSortPoints = () => {
-    // const tripEvents = this.#boardContainer.querySelector('.trip-events');
     const titleTripEvents = this.#tripEvents.querySelector('h2');
 
     render(titleTripEvents, new FormTripSortPointsView(), RenderPosition.AFTEREND);
@@ -53,10 +55,11 @@ export default class TripPresenter {
 
   #renderTripPointsList = () => {
     const formTripSort = this.#tripEvents.querySelector('.trip-events__trip-sort');
-    const pointList = new TripEventsListVeiw();
+    // const pointList = new TripEventsListVeiw();
 
-    render(formTripSort, pointList, RenderPosition.AFTEREND);
-    this.#boardPoints.forEach((point) => this.#renderPoint(pointList.element, point));
+    render(formTripSort, this.#pointList, RenderPosition.AFTEREND);
+    // this.#boardPoints.forEach((point) => this.#renderPoint(pointList.element, point));
+    this.#boardPoints.forEach((point) => this.#PointPresenter.renderPoint(point));
   }
 
   #renderPoint = (pointListElement, point) => {
@@ -94,7 +97,6 @@ export default class TripPresenter {
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });
-
 
     render(pointListComponent.element, pointComponent, RenderPosition.BEFOREEND);
     render(pointListElement, pointListComponent, RenderPosition.BEFOREEND);
