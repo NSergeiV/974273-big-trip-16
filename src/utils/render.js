@@ -42,6 +42,8 @@ export const replace = (newElement, oldElement) => {
 
   const newChild = newElement instanceof AbstractView ? newElement.element : newElement;
   const oldChild = oldElement instanceof AbstractView ? oldElement.element : oldElement;
+  console.log(newChild);
+  console.log(oldChild);
 
   const parent = oldChild.parentElement;
 
