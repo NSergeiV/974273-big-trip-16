@@ -83,6 +83,16 @@ export default class RoutePointView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClick);
   }
 
+  setEditClickFavorite = (callback) => {
+    this._callback.editClickFavorite = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#editClickFavorite);
+  }
+
+  #editClickFavorite = (evt) => {
+    evt.preventDefault();
+    this._callback.editClickFavorite();
+  }
+
   #editClick = (evt) => {
     evt.preventDefault();
     this._callback.click();
