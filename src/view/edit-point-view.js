@@ -1,7 +1,28 @@
 import AbstractView from './abstract-view.js';
 
-const createEventOffer = (offers) => (
-  `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
+const BLANK_POINT = {
+  id: null,
+  dateStart: null,
+  dateEnd: null,
+  eventDate: null,
+  eventDateStart: null,
+  eventTimeStart: null,
+  travelTime: null,
+  eventDateEnd: null,
+  eventTimeEnd: null,
+  travelTimeMinute: null,
+  eventType: null,
+  eventCity: null,
+  eventIcon: null,
+  eventPrice: null,
+  eventOffer: [],
+  description: '',
+  eventPhoto: null,
+  isFavorite: false,
+};
+
+const createEventOffer = (offers, isOfferLength) => (
+  `${isOfferLength ? `<section class="event__section  event__section--offers">
      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
      <div class="event__available-offers">
      ${offers.map((offer) => `<div class="event__offer-selector">
@@ -28,20 +49,22 @@ const createEventDescription = (description) => (
   `<p class="event__destination-description">${description}</p>`
 );
 
-const createEventDestination = (description, eventPhotos) => (
-  `${description || eventPhotos ? `<section class="event__section  event__section--destination">
+const createEventDestination = (description, eventPhotos, isDescriptionLength, isEventPhoto) => (
+  `${isDescriptionLength || isEventPhoto ? `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      ${description ? createEventDescription(description) : ''}
-      ${eventPhotos ? createEventPhoto(eventPhotos) : ''}
+      ${isDescriptionLength ? createEventDescription(description) : ''}
+      ${isEventPhoto ? createEventPhoto(eventPhotos) : ''}
     </section>` : ' '}`
 );
 
 const createFormEditPointTemplate = (data) => {
 
-  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice} = data;
+  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isDescriptionLength, isEventPhoto, isEventType} = data;
 
-  const repeatingOffer = createEventOffer(eventOffer);
-  const destination = createEventDestination(description, eventPhoto);
+  const repeatingOffer = createEventOffer(eventOffer, isOfferLength);
+  const destination = createEventDestination(description, eventPhoto, isDescriptionLength, isEventPhoto);
+
+  const isSubmitDisabled = isEventType;
 
   return `<form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -132,7 +155,7 @@ const createFormEditPointTemplate = (data) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${eventPrice}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -145,17 +168,89 @@ const createFormEditPointTemplate = (data) => {
     </form>`;
 };
 
+// ${isSubmitDisabled ? 'disabled' : ''}
+
 export default class FormEditPointView extends AbstractView {
 
-  #routePoint = null;
-
-  constructor(routePoint) {
+  constructor(routePoint = BLANK_POINT) {
     super();
-    this.#routePoint = routePoint;
+    this._data = FormEditPointView.parsePointToData(routePoint);
+    this._testData = routePoint;
+
+    this._testTypePoint = [
+      {
+        eventType: 'Taxi',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}, {'Choose seats': 5}, {'Travel by train': 40}],
+        eventIcon: 'img/icons/taxi.png',
+      },
+      {
+        eventType: 'Bus',
+        eventOffer: [],
+        eventIcon: 'img/icons/bus.png',
+      },
+      {
+        eventType: 'Train',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}],
+        eventIcon: 'img/icons/train.png',
+      },
+      {
+        eventType: 'Ship',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}, {'Choose seats': 5}],
+        eventIcon: 'img/icons/ship.png',
+      },
+      {
+        eventType: 'Drive',
+        eventOffer: [{'Add luggage': 30}],
+        eventIcon: 'img/icons/drive.png',
+      },
+      {
+        eventType: 'Flight',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}, {'Choose seats': 5}],
+        eventIcon: 'img/icons/flight.png',
+      },
+      {
+        eventType: 'Check-in',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}, {'Choose seats': 5}, {'Travel by train': 40}],
+        eventIcon: 'img/icons/check-in.png',
+      },
+      {
+        eventType: 'Sightseeing',
+        eventOffer: [],
+        eventIcon: 'img/icons/sightseeing.png',
+      },
+      {
+        eventType: 'Restaurant',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}],
+        eventIcon: 'img/icons/restaurant.png',
+      },
+      {
+        eventType: 'Transport',
+        eventOffer: [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}],
+        eventIcon: 'img/icons/transport.png',
+      },
+    ];
+
+    this._testDestination = [
+      {
+        city: 'Amsterdam',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        eventPhoto: ['http://picsum.photos/248/152?r=0.9915930555535986'],
+      },
+      { city: 'Geneva',
+        description: 'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+        eventPhoto: null,
+      },
+      { city: 'Chamonix',
+        description: '',
+        eventPhoto: ['http://picsum.photos/248/152?r=0.22033087115957795'],
+      },
+    ];
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createFormEditPointTemplate(this.#routePoint);
+    return createFormEditPointTemplate(this._data);
   }
 
   setFormClickHandler = (callback) => {
@@ -168,6 +263,93 @@ export default class FormEditPointView extends AbstractView {
     this.element.addEventListener('submit', this.#formSubmitHandler);
   }
 
+  #setInnerHandlers = () => {
+    console.log('ПРИХОДИТ');
+    this.element.querySelector('fieldset').addEventListener('click', this.#formSelectTypePoint);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#formSelectDestination);
+    const inputPrice = this.element.querySelector('.event__input--price');
+
+    inputPrice.addEventListener('keyup', () => {
+      const valuePrice = inputPrice.value;
+      if (valuePrice.match(/[^\d]+/g)) {
+        inputPrice.setCustomValidity('Нужны цифры');
+      } else if (valuePrice === '') {
+        inputPrice.setCustomValidity('Заполните пожалуйста');
+      } else {
+        inputPrice.setCustomValidity('');
+      }
+      inputPrice.reportValidity();
+    });
+
+    const inputDestination = this.element.querySelector('.event__input--destination');
+    const cities = this._testDestination.map((item) => item.city);
+
+    inputDestination.addEventListener('input', () => {
+      const destinationValue = inputDestination.value;
+      if (destinationValue.length !== 0) {
+        cities.forEach((city) => {
+          if (city.toLowerCase().includes(destinationValue.toLowerCase(), 1)) {
+            inputDestination.setCustomValidity('Выберите из списка.');
+          } else {
+            inputDestination.setCustomValidity('Такого города нет в списке.');
+          }
+        });
+      } else {
+        inputDestination.setCustomValidity('Введите название города.');
+      }
+      inputDestination.reportValidity();
+    });
+  }
+
+  #formSelectTypePoint = (evt) => {
+    evt.preventDefault();
+
+    const nameIconType = evt.target.closest('div').querySelector('input').value;
+    const nameTypeChoice = evt.target.textContent;
+
+    console.log(nameIconType);
+    console.log(nameTypeChoice);
+
+    console.log(this._testData.eventType);
+
+    if (this._testData.eventType !== nameTypeChoice) {
+      console.log(true);
+    } else {
+      console.log(false);
+    }
+
+    const typeReplacement = this._testData.eventType !== nameTypeChoice ? false : true;
+    console.log(typeReplacement);
+
+    this.element.querySelector('.event__type-output').textContent = nameTypeChoice;
+    this.element.querySelector('.event__type-icon').src = `img/icons/${nameIconType}.png`;
+    this.element.querySelector('.event__type-list').style.display = 'none';
+
+    const transportType = this._testTypePoint.filter((type) => type.eventType === nameTypeChoice);
+
+    this.updateData({
+      isEventType: typeReplacement,
+      isOfferLength: transportType[0].eventOffer.length !== 0,
+      eventIcon: transportType[0].eventIcon,
+      eventType: transportType[0].eventType,
+      eventOffer: transportType[0].eventOffer,
+    });
+  }
+
+  #formSelectDestination = (evt) => {
+    const nameCite = evt.target.value;
+    const descriptionCity = this._testDestination.filter((element) => element.city === nameCite);
+
+    evt.preventDefault();
+    this.updateData({
+      isEventPhoto: descriptionCity[0].eventPhoto !== null,
+      isDescriptionLength: descriptionCity[0].description.length !== 0,
+      eventCity: evt.target.value,
+      description: descriptionCity[0].description,
+      eventPhoto: descriptionCity[0].eventPhoto,
+    });
+  }
+
   #formHandler = (evt) => {
     evt.preventDefault();
     this._callback.formClick();
@@ -175,6 +357,70 @@ export default class FormEditPointView extends AbstractView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(FormEditPointView.parsePointToData(this._data));
+  }
+
+  updateData = (update) => {
+    if (!update) {
+      return;
+    }
+
+    this._data = {...this._data, ...update};
+
+    this.updateElement();
+  }
+
+  updateElement = () => {
+    const prevElement = this.element;
+
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.element;
+
+    parent.replaceChild(newElement, prevElement);
+
+    this.restoreHandlers();
+  }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormClickHandler(this._callback.formClick);
+  }
+
+  static parsePointToData = (point) => ({
+    ...point,
+    isEventType: point.eventType !== null,
+    isEventPhoto: point.eventPhoto !== null,
+    isOfferLength: point.eventOffer.length !== 0,
+    isDescriptionLength: point.description.length !== 0,
+  })
+
+  static parseDataToPoint = (data) => {
+    const point = {...data};
+
+    if (!point.isEventType) {
+      point.eventType = null;
+    }
+
+    if (!point.isEventPhoto) {
+      point.eventPhoto = null;
+    }
+
+    if (!point.isOfferLength) {
+      point.eventOffer = [];
+    }
+
+    if (!point.isDescriptionLength) {
+      point.description = '';
+    }
+
+    delete point.isEventType;
+    delete point.isEventPhoto;
+    delete point.isOfferLength;
+    delete point.isDescriptionLength;
+
+    return point;
   }
 }
