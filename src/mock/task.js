@@ -4,7 +4,38 @@ import {nanoid} from 'nanoid';
 
 const descriptions = ['Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'Cras aliquet varius magna, non porta ligula feugiat eget.', 'Fusce tristique felis at fermentum pharetra.', 'Aliquam id orci ut lectus varius viverra.', 'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.', 'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.', 'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.', 'Sed sed nisi sed augue convallis suscipit in sed felis.', 'Aliquam erat volutpat.', 'Nunc fermentum tortor ac porta dapibus.', 'In rutrum ac purus sit amet tempus.'];
 
-const offers = [{'Add luggage': 30}, {'Switch to comfort class': 100}, {'Add meal': 15}, {'Choose seats': 5}, {'Travel by train': 40}];
+const offers = [
+  {
+    id: 1,
+    title: 'Add luggage',
+    price: 30,
+    isActive: true
+  },
+  {
+    id: 2,
+    title: 'Switch to comfort',
+    price: 100,
+    isActive: true
+  },
+  {
+    id: 3,
+    title: 'Add meal',
+    price: 15,
+    isActive: true
+  },
+  {
+    id: 4,
+    title: 'Choose seats',
+    price: 5,
+    isActive: true
+  },
+  {
+    id: 5,
+    title: 'Travel by train',
+    price: 40,
+    isActive: true
+  }
+];
 
 const generateDescription = (length) => {
   const descriptionsNew = new Array(length).fill().map(() => {
@@ -41,11 +72,13 @@ const generateOffer = () => {
 let nameEventIcon;
 
 const generateEventType = () => {
-  const types = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant', 'Transport'];
+  const types = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing', 'Restaurant'];
   const randomIndex = getRandomInteger(0, types.length - 1);
   nameEventIcon = `img/icons/${types[randomIndex].toLowerCase()}.png`;
   return types[randomIndex];
 };
+
+// , 'Transport'
 
 const generateCity = () => {
   const citys = ['Amsterdam', 'Chamonix', 'Geneva', 'Berlin', 'Amsterdam', 'Athens', 'Tbilisi', 'Madrid', 'Rome', 'Moscow'];

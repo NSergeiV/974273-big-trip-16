@@ -1,15 +1,41 @@
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
-const createEventOffer = (offers) => (
-  `${offers.length !== 0 ? `<section class="event__section  event__section--offers">
+const BLANK_POINT = {
+  id: null,
+  dateStart: null,
+  dateEnd: null,
+  eventDate: null,
+  eventDateStart: null,
+  eventTimeStart: null,
+  travelTime: null,
+  eventDateEnd: null,
+  eventTimeEnd: null,
+  travelTimeMinute: null,
+  eventType: null,
+  eventCity: null,
+  eventIcon: null,
+  eventPrice: null,
+  eventOffer: [],
+  description: '',
+  eventPhoto: null,
+  isFavorite: false,
+};
+
+const findLastWord = (str) => {
+  const arrayString = str.split(' ');
+  return arrayString[arrayString.length -1];
+};
+
+const createEventOffer = (offers, isOfferLength) => (
+  `${isOfferLength ? `<section class="event__section  event__section--offers">
      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
      <div class="event__available-offers">
      ${offers.map((offer) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${Object.keys(offer)}-1" type="checkbox" name="event-offer-${Object.keys(offer)}" checked>
-        <label class="event__offer-label" for="event-offer-${Object.keys(offer)}-1">
-          <span class="event__offer-title">${Object.keys(offer)}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${findLastWord(offer.title)}-1" type="checkbox" name="event-offer-${findLastWord(offer.title)}" ${offer.isActive ? 'checked' : ''} data-id = "${offer.id}">
+        <label class="event__offer-label" for="event-offer-${findLastWord(offer.title)}-1">
+          <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${Object.values(offer)}</span>
+          <span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`).join('')}
     </div>
@@ -28,20 +54,22 @@ const createEventDescription = (description) => (
   `<p class="event__destination-description">${description}</p>`
 );
 
-const createEventDestination = (description, eventPhotos) => (
-  `${description || eventPhotos ? `<section class="event__section  event__section--destination">
+const createEventDestination = (description, eventPhotos, isDescriptionLength, isEventPhoto) => (
+  `${isDescriptionLength || isEventPhoto ? `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      ${description ? createEventDescription(description) : ''}
-      ${eventPhotos ? createEventPhoto(eventPhotos) : ''}
+      ${isDescriptionLength ? createEventDescription(description) : ''}
+      ${isEventPhoto ? createEventPhoto(eventPhotos) : ''}
     </section>` : ' '}`
 );
 
 const createFormEditPointTemplate = (data) => {
 
-  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice} = data;
+  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isOfferClick, isDescriptionLength, isEventPhoto, isEventType, isEventPrice, isEventCity} = data;
 
-  const repeatingOffer = createEventOffer(eventOffer);
-  const destination = createEventDestination(description, eventPhoto);
+  const repeatingOffer = createEventOffer(eventOffer, isOfferLength);
+  const destination = createEventDestination(description, eventPhoto, isDescriptionLength, isEventPhoto);
+
+  const isSubmitDisabled = isEventType && isEventPrice && isOfferClick && isEventCity;
 
   return `<form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -129,10 +157,10 @@ const createFormEditPointTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${eventPrice}>
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${eventPrice} autocomplete="off">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
@@ -145,17 +173,258 @@ const createFormEditPointTemplate = (data) => {
     </form>`;
 };
 
-export default class FormEditPointView extends AbstractView {
+export default class FormEditPointView extends SmartView {
+  #arrayId = [];
 
-  #routePoint = null;
-
-  constructor(routePoint) {
+  constructor(routePoint = BLANK_POINT) {
     super();
-    this.#routePoint = routePoint;
+    this._data = FormEditPointView.parsePointToData(routePoint);
+    this._testData = routePoint;
+
+    this._testTypePoint = [
+      {
+        eventType: 'Taxi',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          },
+          {
+            id: 4,
+            title: 'Choose seats',
+            price: 5,
+            isActive: true
+          },
+          {
+            id: 5,
+            title: 'Travel by train',
+            price: 40,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/taxi.png',
+      },
+      {
+        eventType: 'Bus',
+        eventOffer: [],
+        eventIcon: 'img/icons/bus.png',
+      },
+      {
+        eventType: 'Train',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/train.png',
+      },
+      {
+        eventType: 'Ship',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          },
+          {
+            id: 4,
+            title: 'Choose seats',
+            price: 5,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/ship.png',
+      },
+      {
+        eventType: 'Drive',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/drive.png',
+      },
+      {
+        eventType: 'Flight',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          },
+          {
+            id: 4,
+            title: 'Choose seats',
+            price: 5,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/flight.png',
+      },
+      {
+        eventType: 'Check-in',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          },
+          {
+            id: 4,
+            title: 'Choose seats',
+            price: 5,
+            isActive: true
+          },
+          {
+            id: 5,
+            title: 'Travel by train',
+            price: 40,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/check-in.png',
+      },
+      {
+        eventType: 'Sightseeing',
+        eventOffer: [],
+        eventIcon: 'img/icons/sightseeing.png',
+      },
+      {
+        eventType: 'Restaurant',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/restaurant.png',
+      },
+      {
+        eventType: 'Transport',
+        eventOffer: [
+          {
+            id: 1,
+            title: 'Add luggage',
+            price: 30,
+            isActive: true
+          },
+          {
+            id: 2,
+            title: 'Switch to comfort',
+            price: 100,
+            isActive: true
+          },
+          {
+            id: 3,
+            title: 'Add meal',
+            price: 15,
+            isActive: true
+          }
+        ],
+        eventIcon: 'img/icons/transport.png',
+      },
+    ];
+
+    this._testDestination = [
+      {
+        city: 'Amsterdam',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        eventPhoto: ['http://picsum.photos/248/152?r=0.9915930555535986'],
+      },
+      { city: 'Geneva',
+        description: 'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+        eventPhoto: null,
+      },
+      { city: 'Chamonix',
+        description: '',
+        eventPhoto: ['http://picsum.photos/248/152?r=0.22033087115957795'],
+      },
+    ];
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createFormEditPointTemplate(this.#routePoint);
+    return createFormEditPointTemplate(this._data);
   }
 
   setFormClickHandler = (callback) => {
@@ -168,6 +437,159 @@ export default class FormEditPointView extends AbstractView {
     this.element.addEventListener('submit', this.#formSubmitHandler);
   }
 
+  #setInnerHandlers = () => {
+    this.element.querySelector('fieldset').addEventListener('click', this.#formSelectTypePoint);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#formSelectDestination);
+
+    if (this._data.eventOffer.length !== 0) {
+      this.element.querySelector('.event__section--offers').addEventListener('click', this.#formSelectOffers);
+    }
+
+    const inputPrice = this.element.querySelector('.event__input--price');
+
+    inputPrice.addEventListener('input', () => {
+      let valuePrice = inputPrice.value;
+      const priceReplacement = (this._testData.eventPrice).toString() === valuePrice;
+
+      if (valuePrice.match(/[^\d]+/g)) {
+        inputPrice.setCustomValidity('Нужно целое положительное число');
+        this.element.querySelector('.event__save-btn').setAttribute('disabled', '');
+      } else if (valuePrice === '') {
+        inputPrice.setCustomValidity('Заполните пожалуйста');
+        this.element.querySelector('.event__save-btn').setAttribute('disabled', '');
+      } else {
+        inputPrice.setCustomValidity('');
+
+        if (priceReplacement) {
+          if (this._data.isEventType && this._data.isOfferClick && this._data.isEventCity) {
+            this.element.querySelector('.event__save-btn').setAttribute('disabled', '');
+          }
+
+          valuePrice = this._testData.eventPrice;
+          this.updateData({
+            isEventPrice: priceReplacement,
+            eventPrice: valuePrice,
+          }, true);
+          return;
+        }
+        this.element.querySelector('.event__save-btn').removeAttribute('disabled');
+        this.updateData({
+          isEventPrice: priceReplacement,
+          eventPrice: valuePrice,
+        }, true);
+      }
+
+      inputPrice.reportValidity();
+    });
+
+    const inputDestination = this.element.querySelector('.event__input--destination');
+    const cities = this._testDestination.map((item) => item.city);
+
+    inputDestination.addEventListener('input', () => {
+      let destinationValue = inputDestination.value;
+      const destinationReplacement = this._testData.eventCity === destinationValue;
+
+      if (destinationValue.length === 0) {
+        this.element.querySelector('.event__save-btn').setAttribute('disabled', '');
+        inputDestination.setCustomValidity('Введите название города.');
+      } else if (cities.includes(destinationValue, 1) === false) {
+        inputDestination.setCustomValidity('Такого города нет в списке.');
+      } else {
+        inputDestination.setCustomValidity('');
+      }
+
+      if (destinationReplacement) {
+        if (this._data.isEventType && this._data.isOfferClick && this._data.isEventPrice) {
+          this.element.querySelector('.event__save-btn').setAttribute('disabled', '');
+        }
+
+        destinationValue = this._testData.eventCity;
+        this.updateData({
+          isEventCity: destinationReplacement,
+          eventCity: destinationValue,
+        }, true);
+        return;
+      }
+
+      this.updateData({
+        isEventCity: destinationReplacement,
+        eventCity: destinationValue,
+      }, true);
+
+      inputDestination.reportValidity();
+    });
+  }
+
+  #formSelectTypePoint = (evt) => {
+    evt.preventDefault();
+
+    const nameIconType = evt.target.closest('div').querySelector('input').value;
+    const nameTypeChoice = evt.target.textContent;
+
+    const typeReplacement = this._testData.eventType === nameTypeChoice;
+
+    this.element.querySelector('.event__type-output').textContent = nameTypeChoice;
+    this.element.querySelector('.event__type-icon').src = `img/icons/${nameIconType}.png`;
+    this.element.querySelector('.event__type-list').style.display = 'none';
+
+    this._testTypePoint.forEach((data) => data.eventOffer.forEach((offer) => (offer.isActive = true)));
+
+    const transportType = this._testTypePoint.filter((type) => type.eventType === nameTypeChoice);
+
+    this.updateData({
+      isEventType: typeReplacement,
+      isOfferLength: transportType[0].eventOffer.length !== 0,
+      eventIcon: transportType[0].eventIcon,
+      eventType: transportType[0].eventType,
+      eventOffer: transportType[0].eventOffer,
+    });
+
+    this.#arrayId.splice(0, this.#arrayId.length);
+  }
+
+  #formSelectDestination = (evt) => {
+    const nameCite = evt.target.value;
+    const descriptionCity = this._testDestination.filter((element) => element.city === nameCite);
+
+    evt.preventDefault();
+    this.updateData({
+      isEventPhoto: descriptionCity[0].eventPhoto !== null,
+      isDescriptionLength: descriptionCity[0].description.length !== 0,
+      eventCity: evt.target.value,
+      description: descriptionCity[0].description,
+      eventPhoto: descriptionCity[0].eventPhoto,
+    });
+  }
+
+  #formSelectOffers = (evt) => {
+    if (evt.target.matches('input[type="checkbox"]')) {
+      const offerId = evt.target.dataset.id;
+      const arrayOffers = this._data.eventOffer;
+      if (this.#arrayId.length === 0) {
+        this.#arrayId.push(offerId);
+      } else {
+        if (this.#arrayId.includes(offerId)) {
+          this.#arrayId = this.#arrayId.filter((item) => item !== offerId);
+        } else {
+          this.#arrayId.push(offerId);
+        }
+      }
+
+      const offerStatusChanged = this.#arrayId.length === 0;
+
+      if (arrayOffers[offerId -1].isActive) {
+        arrayOffers[offerId -1].isActive = false;
+      } else {
+        arrayOffers[offerId -1].isActive = true;
+      }
+
+      this.updateData({
+        isOfferClick: offerStatusChanged,
+        eventOffer: arrayOffers,
+      });
+    }
+  }
+
   #formHandler = (evt) => {
     evt.preventDefault();
     this._callback.formClick();
@@ -175,6 +597,71 @@ export default class FormEditPointView extends AbstractView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(FormEditPointView.parsePointToData(this._data));
+  }
+
+  reset = (task) => {
+    this.updateData(
+      FormEditPointView.parsePointToData(task),
+    );
+  }
+
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormClickHandler(this._callback.formClick);
+  }
+
+  static parsePointToData = (point) => ({
+    ...point,
+    isEventPrice: point.eventPrice !== null,
+    isEventType: point.eventType !== null,
+    isEventPhoto: point.eventPhoto !== null,
+    isOfferLength: point.eventOffer.length !== 0,
+    isOfferClick: point.eventOffer.length !== 0,
+    isDescriptionLength: point.description.length !== 0,
+    isEventCity: point.eventCity !== 0,
+  })
+
+  static parseDataToPoint = (data) => {
+    const point = {...data};
+
+    if (!point.isEventCity) {
+      point.eventCity = null;
+    }
+
+    if (!point.isEventPrice) {
+      point.eventPrice = null;
+    }
+
+    if (!point.isEventType) {
+      point.eventType = null;
+    }
+
+    if (!point.isEventPhoto) {
+      point.eventPhoto = null;
+    }
+
+    if (!point.isOfferLength) {
+      point.eventOffer = [];
+    }
+
+    if (!point.isOfferClick) {
+      point.eventOffer = [];
+    }
+
+    if (!point.isDescriptionLength) {
+      point.description = '';
+    }
+
+    delete point.isEventType;
+    delete point.isEventCity;
+    delete point.isEventPrice;
+    delete point.isEventPhoto;
+    delete point.isOfferLength;
+    delete point.isOfferClick;
+    delete point.isDescriptionLength;
+
+    return point;
   }
 }
