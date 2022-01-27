@@ -1,4 +1,8 @@
 import SmartView from './smart-view.js';
+import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   id: null,
@@ -64,12 +68,12 @@ const createEventDestination = (description, eventPhotos, isDescriptionLength, i
 
 const createFormEditPointTemplate = (data) => {
 
-  const {eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isOfferClick, isDescriptionLength, isEventPhoto, isEventType, isEventPrice, isEventCity} = data;
+  const {eventDate, eventDateEnd, eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isOfferClick, isDescriptionLength, isEventPhoto, isEventType, isEventPrice, isEventCity, isEventDataEndChange, isEventDataChange} = data;
 
   const repeatingOffer = createEventOffer(eventOffer, isOfferLength);
   const destination = createEventDestination(description, eventPhoto, isDescriptionLength, isEventPhoto);
 
-  const isSubmitDisabled = isEventType && isEventPrice && isOfferClick && isEventCity;
+  const isSubmitDisabled = isEventDataEndChange && isEventDataChange && isEventType && isEventPrice && isOfferClick && isEventCity;
 
   return `<form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -146,10 +150,10 @@ const createFormEditPointTemplate = (data) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventDateEnd}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -175,6 +179,7 @@ const createFormEditPointTemplate = (data) => {
 
 export default class FormEditPointView extends SmartView {
   #arrayId = [];
+  #datepicker = null;
 
   constructor(routePoint = BLANK_POINT) {
     super();
@@ -421,10 +426,67 @@ export default class FormEditPointView extends SmartView {
     ];
 
     this.#setInnerHandlers();
+    this.#setDatepicker();
   }
 
   get template() {
     return createFormEditPointTemplate(this._data);
+  }
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepicker) {
+      this.#datepicker.destroy();
+      this.#datepicker = null;
+    }
+  }
+
+  #setDatepicker = () => {
+    if (this.#datepicker) {
+      this.#datepicker.destroy();
+      this.#datepicker = null;
+    }
+
+    flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        altInput: true,
+        altFormat: 'd/m/y H:i',
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._data.eventDate,
+        onChange: this.#startDateHandler,
+      },
+    );
+
+    flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        altInput: true,
+        altFormat: 'd/m/y H:i',
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._data.eventDateEnd,
+        onChange: this.#finishDateHandler,
+      },
+    );
+  }
+
+  #startDateHandler = ([userDate]) => {
+    const compare = (this._testData.eventDate === dayjs(userDate).format('DD/MM/YY HH:mm'));
+    this.updateData({
+      isEventDataChange: compare,
+      eventDate: userDate,
+    });
+  }
+
+  #finishDateHandler =([userDate]) => {
+    const compare = (this._testData.eventDateEnd === dayjs(userDate).format('DD/MM/YY HH:mm'));
+    this.updateData({
+      isEventDataEndChange: compare,
+      eventDateEnd: userDate,
+    });
   }
 
   setFormClickHandler = (callback) => {
@@ -608,6 +670,7 @@ export default class FormEditPointView extends SmartView {
 
   restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormClickHandler(this._callback.formClick);
   }
@@ -621,6 +684,8 @@ export default class FormEditPointView extends SmartView {
     isOfferClick: point.eventOffer.length !== 0,
     isDescriptionLength: point.description.length !== 0,
     isEventCity: point.eventCity !== 0,
+    isEventDataChange: point.eventDate !== 0,
+    isEventDataEndChange: point.eventDateEnd !== 0,
   })
 
   static parseDataToPoint = (data) => {
@@ -655,6 +720,8 @@ export default class FormEditPointView extends SmartView {
     }
 
     delete point.isEventType;
+    delete point.isEventDataChange;
+    delete point.isEventDataEndChange;
     delete point.isEventCity;
     delete point.isEventPrice;
     delete point.isEventPhoto;
