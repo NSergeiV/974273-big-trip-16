@@ -11,7 +11,7 @@ const generateDate = (date) => {
   return isDate;
 };
 
-const calculate = (d, h, m) => {
+export const calculate = (d, h, m) => {
   if (d !== 0) {
     const day = dayjs().date(d).format('DD');
     const hour = dayjs().hour(h).format('HH');
