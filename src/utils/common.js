@@ -8,7 +8,7 @@ export const getRandomInteger = (a = 0, b = 1) => {
 };
 
 export const compare = (a, b) => (dayjs(a.dateStart).isAfter(dayjs(b.dateStart))) ? 1 : -1;
-
+/*
 export const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
@@ -22,3 +22,4 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1),
   ];
 };
+*/

@@ -1,25 +1,60 @@
 import SmartView from './smart-view.js';
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import flatpickr from 'flatpickr';
+// import {calculate} from '../utils/task.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  id: null,
-  dateStart: null,
-  dateEnd: null,
-  eventDate: null,
-  eventDateStart: null,
-  eventTimeStart: null,
-  travelTime: null,
-  eventDateEnd: null,
-  eventTimeEnd: null,
-  travelTimeMinute: null,
-  eventType: null,
-  eventCity: null,
-  eventIcon: null,
-  eventPrice: null,
-  eventOffer: [],
+  id: nanoid(),
+  dateStart: dayjs().format('DD/MM/YY HH:mm'),
+  dateEnd: dayjs().format('DD/MM/YY HH:mm'),
+  eventDate: dayjs().format('DD/MM/YY HH:mm'),
+  eventDateStart: dayjs().format('MMM DD'),
+  eventTimeStart: dayjs().format('HH:mm'),
+  eventDateEnd: dayjs().format('DD/MM/YY HH:mm'),
+  eventTimeEnd: dayjs().format('HH:mm'),
+  travelTimeMinute: function() { return this.dateEnd.diff(this.dateStart, 'm'); },
+  travelTimeHour: function() { return this.dateEnd.diff(this.dateStart, 'h'); },
+  travelTimeDay: function() { return this.dateEnd.diff(this.dateStart, 'd'); },
+  travelTime: '12H 22M',
+  eventType: 'Taxi',
+  eventCity: 'Amsterdam',
+  eventIcon: 'img/icons/taxi.png',
+  eventPrice: 190,
+  eventOffer: [
+    {
+      id: 1,
+      title: 'Add luggage',
+      price: 30,
+      isActive: true
+    },
+    {
+      id: 2,
+      title: 'Switch to comfort',
+      price: 100,
+      isActive: true
+    },
+    {
+      id: 3,
+      title: 'Add meal',
+      price: 15,
+      isActive: true
+    },
+    {
+      id: 4,
+      title: 'Choose seats',
+      price: 5,
+      isActive: true
+    },
+    {
+      id: 5,
+      title: 'Travel by train',
+      price: 40,
+      isActive: true
+    }
+  ],
   description: '',
   eventPhoto: null,
   isFavorite: false,
@@ -477,7 +512,10 @@ export default class FormEditPointView extends SmartView {
     const compare = (this._testData.eventDate === dayjs(userDate).format('DD/MM/YY HH:mm'));
     this.updateData({
       isEventDataChange: compare,
-      eventDate: userDate,
+      eventDate: dayjs(userDate).format('DD/MM/YY HH:mm'),
+      dateStart: dayjs(userDate),
+      eventTimeStart: dayjs(userDate).format('HH:mm'),
+      eventDateStart: dayjs(userDate).format('MMM DD'),
     });
   }
 
@@ -485,7 +523,9 @@ export default class FormEditPointView extends SmartView {
     const compare = (this._testData.eventDateEnd === dayjs(userDate).format('DD/MM/YY HH:mm'));
     this.updateData({
       isEventDataEndChange: compare,
-      eventDateEnd: userDate,
+      eventDateEnd: dayjs(userDate).format('DD/MM/YY HH:mm'),
+      dateEnd: dayjs(userDate),
+      eventTimeEnd: dayjs(userDate).format('HH:mm')
     });
   }
 
@@ -497,6 +537,11 @@ export default class FormEditPointView extends SmartView {
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
     this.element.addEventListener('submit', this.#formSubmitHandler);
+  }
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
   }
 
   #setInnerHandlers = () => {
@@ -659,12 +704,18 @@ export default class FormEditPointView extends SmartView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
+
     this._callback.formSubmit(FormEditPointView.parsePointToData(this._data));
   }
 
-  reset = (task) => {
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(FormEditPointView.parsePointToData(this._data));
+  }
+
+  reset = (point) => {
     this.updateData(
-      FormEditPointView.parsePointToData(task),
+      FormEditPointView.parsePointToData(point),
     );
   }
 
@@ -673,6 +724,7 @@ export default class FormEditPointView extends SmartView {
     this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormClickHandler(this._callback.formClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   static parsePointToData = (point) => ({
