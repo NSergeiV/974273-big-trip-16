@@ -973,7 +973,9 @@ main {
 .statistics {
   padding-top: 47px;
   padding-left: 37px;
-  background-color: #f2f2f2; }
+  background-color: #f2f2f2;
+  margin:  0 auto;
+  width: 1200px; }
 
 .statistics__item:not(:last-child) {
   margin-bottom: 78px; }

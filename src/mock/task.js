@@ -53,17 +53,7 @@ const generatePhoto = (result = getRandomInteger(0, 1)) => {
   }
   return photoAdress;
 };
-/*
-const getStatusFavorite = () => {
-  const number = getRandomInteger();
-  let favorite = false;
-  if (number === 1) {
-    favorite = true;
-    return favorite;
-  }
-  return favorite;
-};
-*/
+
 const generateOffer = () => {
   const offersNew = offers.slice(0, getRandomInteger(0, 5));
   return offersNew;
@@ -77,8 +67,6 @@ const generateEventType = () => {
   nameEventIcon = `img/icons/${types[randomIndex].toLowerCase()}.png`;
   return types[randomIndex];
 };
-
-// , 'Transport'
 
 const generateCity = () => {
   const citys = ['Amsterdam', 'Chamonix', 'Geneva', 'Berlin', 'Amsterdam', 'Athens', 'Tbilisi', 'Madrid', 'Rome', 'Moscow'];
