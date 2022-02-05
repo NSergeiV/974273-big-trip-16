@@ -7,6 +7,7 @@ export default class PointNewPresenter {
   #pointListContainer = null;
   #changeData = null;
   #pointEditComponent = null;
+  #destroyCallback = null;
 
   constructor(pointListContainer, changeData) {
     this.#pointListContainer = pointListContainer;
@@ -14,7 +15,9 @@ export default class PointNewPresenter {
 
   }
 
-  init = () => {
+  init = (callback) => {
+    this.#destroyCallback = callback;
+
     if (this.#pointEditComponent !== null) {
       return;
     }
@@ -33,6 +36,8 @@ export default class PointNewPresenter {
       return;
     }
 
+    this.#destroyCallback?.();
+
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
 
@@ -43,8 +48,6 @@ export default class PointNewPresenter {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      // Пока у нас нет сервера, который бы после сохранения
-      // выдывал честный id задачи, нам нужно позаботиться об этом самим
       {id: nanoid(), ...point},
     );
     this.destroy();

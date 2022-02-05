@@ -2,10 +2,8 @@ import SmartView from './smart-view.js';
 import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import flatpickr from 'flatpickr';
-// import {calculate} from '../utils/task.js';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
 const BLANK_POINT = {
   id: nanoid(),
   dateStart: dayjs().format('DD/MM/YY HH:mm'),
@@ -18,7 +16,7 @@ const BLANK_POINT = {
   travelTimeMinute: function() { return this.dateEnd.diff(this.dateStart, 'm'); },
   travelTimeHour: function() { return this.dateEnd.diff(this.dateStart, 'h'); },
   travelTimeDay: function() { return this.dateEnd.diff(this.dateStart, 'd'); },
-  travelTime: '12H 22M',
+  travelTime: null,
   eventType: 'Taxi',
   eventCity: 'Amsterdam',
   eventIcon: 'img/icons/taxi.png',
