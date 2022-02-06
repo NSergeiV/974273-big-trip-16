@@ -1,4 +1,6 @@
 import AbstractView from './abstract-view.js';
+import dayjs from 'dayjs';
+import {calculate} from '../utils/task.js';
 
 const offerTemplate = (offer, price) => (
   `<li class="event__offer">
@@ -30,21 +32,26 @@ const checkFavorite = (result) => {
 
 const createRoutePointTemplate = (data) => {
 
-  const {eventDateStart, eventIcon, eventType, eventCity, eventTimeStart, eventTimeEnd, travelTime, eventPrice, eventOffer, isFavorite} = data;
+  const {dateStart, dateEnd, eventType, eventCity, eventPrice, eventOffer, isFavorite} = data;
+  const date1 = dayjs(dateEnd);
+  const date2 = dayjs(dateStart);
+  const travelTimeDay = date1.diff(date2, 'd');
+  const travelTimeHour = date1.diff(date2, 'h');
+  const travelTimeMinute = date1.diff(date2, 'm');
 
   return `<div class="event">
-      <time class="event__date" datetime="2019-03-18">${eventDateStart}</time>
+      <time class="event__date" datetime="2019-03-18">${dayjs(dateStart).format('MMM DD')}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src=${eventIcon} alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${eventType} ${eventCity}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${eventTimeStart}</time>
+          <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(dateStart).format('HH:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${eventTimeEnd}</time>
+          <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(dateEnd).format('HH:mm')}</time>
         </p>
-        <p class="event__durationTime">${travelTime}</p>
+        <p class="event__durationTime">${calculate(travelTimeDay, travelTimeHour, travelTimeMinute)}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${eventPrice}</span>

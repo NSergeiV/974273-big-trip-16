@@ -1,6 +1,4 @@
 import TripPresenter from './presenter/trip-presenter.js';
-import {generateTask} from './mock/task.js';
-import {compare} from './utils/common.js';
 import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
@@ -9,12 +7,14 @@ import StatisticsView from './view/stats-view.js';
 import ButtonNewPointView from './view/button-new-point-view.js';
 import {render, RenderPosition, remove} from './utils/render.js';
 import {MenuItem, UpdateType, FilterType} from './const.js';
+import ApiService from './api-service.js';
 
-const TASK_COUNT = 20;
+// const TASK_COUNT = 20;
+const AUTHORIZATION = 'Basic sjliSenvDsaos8457';
+const END_POINT = 'https://16.ecmascript.pages.academy/big-trip';
 
-const tripPoints = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
-const pointsModel = new PointsModel();
-pointsModel.points = tripPoints;
+// const tripPoints = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
+const pointsModel = new PointsModel(new ApiService(END_POINT, AUTHORIZATION));
 
 const filterModel = new FilterModel();
 
@@ -67,12 +67,21 @@ const handleStatsMenuClick = (menuItem) => {
   }
 };
 
-statsMenuComponent.setStatsMenuClickHandler(handleStatsMenuClick);
-buttonNewEvent.setButtonNewClickHandler(handleStatsMenuClick);
+//statsMenuComponent.setStatsMenuClickHandler(handleStatsMenuClick);
+//buttonNewEvent.setButtonNewClickHandler(handleStatsMenuClick);
 
-filterPresenter.init();
-
-render(tripControlsFelter, statsMenuComponent, RenderPosition.AFTEREND);
-render(headerMenu, buttonNewEvent, RenderPosition.BEFOREEND);
-
+//render(tripControlsFelter, statsMenuComponent, RenderPosition.AFTEREND);
+//render(headerMenu, buttonNewEvent, RenderPosition.BEFOREEND);
+// filterPresenter.init();
 tripPresenter.init();
+pointsModel.init().finally(() => {
+
+  render(tripControlsFelter, statsMenuComponent, RenderPosition.AFTEREND);
+  render(headerMenu, buttonNewEvent, RenderPosition.BEFOREEND);
+
+  statsMenuComponent.setStatsMenuClickHandler(handleStatsMenuClick);
+
+  buttonNewEvent.setButtonNewClickHandler(handleStatsMenuClick);
+  filterPresenter.init();
+});
+

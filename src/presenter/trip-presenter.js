@@ -2,6 +2,7 @@ import TripInfoVeiw from '../view/trip-main-info-view.js';
 import FormTripSortPointsView from '../view/form-trip-sort-trip-events-view.js';
 import TripEventsListVeiw from '../view/trip-events-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import {RenderPosition, render, remove} from '../utils/render.js';
 import PointPresenter from './point-presenter.js';
 import PointNewPresenter from './point-new-presenter.js';
@@ -29,6 +30,8 @@ export default class TripPresenter {
   #tripInfo = null;
 
   #pointList = new TripEventsListVeiw();
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
   #sortComponent = null;
 
   constructor(boardContainer, pointsModel, filterModel) {
@@ -118,6 +121,11 @@ export default class TripPresenter {
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   }
 
@@ -158,6 +166,9 @@ export default class TripPresenter {
     this.points.forEach((pointData) => this.#renderPoint(pointData));
   }
 
+  #renderLoading = () => {
+    render(this.#tripEvents, this.#loadingComponent, RenderPosition.AFTERBEGIN);
+  }
 
   #renderNoPoints = () => {
     this.#noPointComponent = new ListEmptyView(this.#filterType);
@@ -172,6 +183,7 @@ export default class TripPresenter {
     this.#pointPresenterCollection.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
 
     if (this.#ls) {
       if (this.#tripInfo) {
@@ -191,6 +203,11 @@ export default class TripPresenter {
   #renderBoard = () => {
     const points = this.points;
     const pointCount = points.length;
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (pointCount === 0) {
       this.#renderNoPoints();
