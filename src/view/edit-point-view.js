@@ -8,15 +8,6 @@ const BLANK_POINT = {
   id: nanoid(),
   dateStart: dayjs().format('DD/MM/YY HH:mm'),
   dateEnd: dayjs().format('DD/MM/YY HH:mm'),
-  eventDate: dayjs().format('DD/MM/YY HH:mm'),
-  eventDateStart: dayjs().format('MMM DD'),
-  eventTimeStart: dayjs().format('HH:mm'),
-  eventDateEnd: dayjs().format('DD/MM/YY HH:mm'),
-  eventTimeEnd: dayjs().format('HH:mm'),
-  travelTimeMinute: function() { return this.dateEnd.diff(this.dateStart, 'm'); },
-  travelTimeHour: function() { return this.dateEnd.diff(this.dateStart, 'h'); },
-  travelTimeDay: function() { return this.dateEnd.diff(this.dateStart, 'd'); },
-  travelTime: null,
   eventType: 'Taxi',
   eventCity: 'Amsterdam',
   eventIcon: 'img/icons/taxi.png',
@@ -26,31 +17,26 @@ const BLANK_POINT = {
       id: 1,
       title: 'Add luggage',
       price: 30,
-      isActive: true
     },
     {
       id: 2,
       title: 'Switch to comfort',
       price: 100,
-      isActive: true
     },
     {
       id: 3,
       title: 'Add meal',
       price: 15,
-      isActive: true
     },
     {
       id: 4,
       title: 'Choose seats',
       price: 5,
-      isActive: true
     },
     {
       id: 5,
       title: 'Travel by train',
       price: 40,
-      isActive: true
     }
   ],
   description: '',
@@ -82,7 +68,7 @@ const createEventOffer = (offers, isOfferLength) => (
 const createEventPhoto = (eventPhotos) => (
   `<div class="event__photos-container">
       <div class="event__photos-tape">
-        ${eventPhotos.map((photo) => `<img src="${photo}" class="event__photo" alt="Event photo">`).join('')}
+        ${eventPhotos.map((photo) => `<img src="${photo.src}" class="event__photo" alt="${photo.description}">`).join('')}
       </div>
     </div>`
 );
@@ -101,7 +87,7 @@ const createEventDestination = (description, eventPhotos, isDescriptionLength, i
 
 const createFormEditPointTemplate = (data) => {
 
-  const {eventDate, eventDateEnd, eventIcon, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isOfferClick, isDescriptionLength, isEventPhoto, isEventType, isEventPrice, isEventCity, isEventDataEndChange, isEventDataChange} = data;
+  const {dateStart, dateEnd, eventType, eventOffer, description, eventPhoto, eventCity, eventPrice, isOfferLength, isOfferClick, isDescriptionLength, isEventPhoto, isEventType, isEventPrice, isEventCity, isEventDataEndChange, isEventDataChange} = data;
 
   const repeatingOffer = createEventOffer(eventOffer, isOfferLength);
   const destination = createEventDestination(description, eventPhoto, isDescriptionLength, isEventPhoto);
@@ -113,7 +99,7 @@ const createFormEditPointTemplate = (data) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src=${eventIcon} alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -183,10 +169,10 @@ const createFormEditPointTemplate = (data) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventDate}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateStart)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventDateEnd}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateEnd)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -500,7 +486,7 @@ export default class FormEditPointView extends SmartView {
         altInput: true,
         altFormat: 'd/m/y H:i',
         dateFormat: 'd/m/y H:i',
-        defaultDate: this._data.eventDateEnd,
+        defaultDate: dayjs(this._data.dateEnd).format('DD/MM/YY HH:mm'),
         onChange: this.#finishDateHandler,
       },
     );
@@ -521,9 +507,10 @@ export default class FormEditPointView extends SmartView {
     const compare = (this._testData.eventDateEnd === dayjs(userDate).format('DD/MM/YY HH:mm'));
     this.updateData({
       isEventDataEndChange: compare,
-      eventDateEnd: dayjs(userDate).format('DD/MM/YY HH:mm'),
+      //eventDateEnd: dayjs(userDate).format('DD/MM/YY HH:mm'),
       dateEnd: dayjs(userDate),
-      eventTimeEnd: dayjs(userDate).format('HH:mm')
+      // 'date_to': point.dayjs(userDate) instanceof Date ? point.dayjs(userDate).toISOString() : null,
+      //eventTimeEnd: dayjs(userDate).format('HH:mm')
     });
   }
 

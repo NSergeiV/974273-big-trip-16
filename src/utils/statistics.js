@@ -33,10 +33,20 @@ export const searchAllTime = (types, points) => {
   const expenses = new Array;
   types.forEach((type) => {
     expenses.push(points.filter((point) => {
+      const date1 = dayjs(point.dateEnd);
+      const date2 = dayjs(point.dateStart);
+      const travelTimeMinute = date1.diff(date2, 'm');
+
       if (type === point.eventType) {
-        return point.travelTimeMinute;
+        return travelTimeMinute;
       }
-    }).map((item) => item.travelTimeMinute).reduce(reducer));
+    }).map((item) => {
+      const date1 = dayjs(item.dateEnd);
+      const date2 = dayjs(item.dateStart);
+      const travelTimeMinute = date1.diff(date2, 'm');
+
+      return travelTimeMinute;
+    }).reduce(reducer));
   });
   return expenses;
 };
