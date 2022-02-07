@@ -1,6 +1,9 @@
+
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class ApiService {
@@ -30,6 +33,29 @@ export default class ApiService {
     return parsedResponse;
   }
 
+  addPoint = async (point) => {
+    const response = await this.#load({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(this.#adaptToServer(point)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
+  deletePoint = async (point) => {
+    const response = await this.#load({
+      url: `points/${point.id}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  }
+
+
   #load = async ({
     url,
     method = Method.GET,
@@ -52,12 +78,13 @@ export default class ApiService {
   }
 
   #adaptToServer = (point) => {
+
     const adaptedPoint = {...point,
       'date_from': point.dateStart instanceof Date ? point.dateStart.toISOString() : null,
       'date_to': point.dateEnd instanceof Date ? point.dateEnd.toISOString() : null,
       'is_favorite': point.isFavorite,
-      'base_price': point.eventPrice,
-      'type': point.eventType,
+      'base_price': Number(point.eventPrice),
+      'type': point.eventType.toLowerCase(),
       'offers': point.eventOffer,
       'destination': {'description': point.description, 'name': point.eventCity, 'pictures': point.eventPhoto,},
     };
@@ -72,6 +99,19 @@ export default class ApiService {
     delete adaptedPoint.eventCity;
     delete adaptedPoint.description;
     delete adaptedPoint.eventType;
+
+    delete adaptedPoint.isEventType;
+    delete adaptedPoint.isEventDataChange;
+    delete adaptedPoint.isEventDataEndChange;
+    delete adaptedPoint.isEventCity;
+    delete adaptedPoint.isEventPrice;
+    delete adaptedPoint.isEventPhoto;
+    delete adaptedPoint.isOfferLength;
+    delete adaptedPoint.isOfferClick;
+    delete adaptedPoint.isDescriptionLength;
+    delete adaptedPoint.isDisabled;
+    delete adaptedPoint.isSaving;
+    delete adaptedPoint.isDeleting;
 
     return adaptedPoint;
   }
