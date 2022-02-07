@@ -9,32 +9,27 @@ const offers = [
     id: 1,
     title: 'Add luggage',
     price: 30,
-    isActive: true
   },
   {
     id: 2,
     title: 'Switch to comfort',
     price: 100,
-    isActive: true
   },
   {
     id: 3,
     title: 'Add meal',
     price: 15,
-    isActive: true
   },
   {
     id: 4,
     title: 'Choose seats',
     price: 5,
-    isActive: true
   },
   {
     id: 5,
     title: 'Travel by train',
     price: 40,
-    isActive: true
-  }
+  },
 ];
 
 const generateDescription = (length) => {
