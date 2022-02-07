@@ -29,7 +29,7 @@ const offers = [
     id: 5,
     title: 'Travel by train',
     price: 40,
-  }
+  },
 ];
 
 const generateDescription = (length) => {
