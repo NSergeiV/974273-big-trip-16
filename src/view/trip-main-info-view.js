@@ -1,4 +1,5 @@
 import AbstractView from './abstract-view.js';
+import dayjs from 'dayjs';
 
 const countPrice = (list) => {
   let summ = 0;
@@ -16,9 +17,9 @@ const createTripInfoTemplate = (data) => {
 
   return `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
-        <h1 class="trip-info__title">${citys.join(' &mdash; ')}</h1>
+        <h1 class="trip-info__title">${data.length <= 3 ? citys.join(' &mdash; ') : `${citys[0]}&nbsp;&hellip;&nbsp;${citys[citys.length - 1]}`}</h1>
 
-        <p class="trip-info__dates">${data[0].eventDateStart}&nbsp;&mdash;&nbsp;${data[numberPoints].eventDateStart}</p>
+        <p class="trip-info__dates">${dayjs(data[0].dateStart).format('MMM DD')}&nbsp;&mdash;&nbsp;${dayjs(data[0].dateStart).format('MMM') === dayjs(data[numberPoints].dateStart).format('MMM') ? dayjs(data[numberPoints].dateStart).format('DD') : dayjs(data[numberPoints].dateStart).format('MMM DD')}</p>
       </div>
 
       <p class="trip-info__cost">

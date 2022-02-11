@@ -1,6 +1,5 @@
 import SmartView from './smart-view.js';
 import dayjs from 'dayjs';
-//import {nanoid} from 'nanoid';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
@@ -199,6 +198,7 @@ const createFormEditPointTemplate = (data) => {
 export default class FormEditPointView extends SmartView {
   #arrayId = [];
   #datepicker = null;
+  #changePrice = 0;
 
   constructor(routePoint = BLANK_POINT) {
     super();
@@ -522,10 +522,7 @@ export default class FormEditPointView extends SmartView {
     const compare = (this._testData.eventDate === dayjs(userDate).format('DD/MM/YY HH:mm'));
     this.updateData({
       isEventDataChange: compare,
-      //eventDate: dayjs(userDate).format('DD/MM/YY HH:mm'),
       dateStart: dayjs(userDate).toDate(),
-      //eventTimeStart: dayjs(userDate).format('HH:mm'),
-      //eventDateStart: dayjs(userDate).format('MMM DD'),
     });
   }
 
@@ -533,10 +530,7 @@ export default class FormEditPointView extends SmartView {
     const compare = (this._testData.eventDateEnd === dayjs(userDate).format('DD/MM/YY HH:mm'));
     this.updateData({
       isEventDataEndChange: compare,
-      //eventDateEnd: dayjs(userDate).format('DD/MM/YY HH:mm'),
       dateEnd: dayjs(userDate).toDate(),
-      // 'date_to': point.dayjs(userDate) instanceof Date ? point.dayjs(userDate).toISOString() : null,
-      //eventTimeEnd: dayjs(userDate).format('HH:mm')
     });
   }
 
@@ -650,7 +644,7 @@ export default class FormEditPointView extends SmartView {
     this.element.querySelector('.event__type-icon').src = `img/icons/${nameIconType}.png`;
     this.element.querySelector('.event__type-list').style.display = 'none';
 
-    this._testTypePoint.forEach((data) => data.eventOffer.forEach((offer) => (offer.isActive = true)));
+    //this._testTypePoint.forEach((data) => data.eventOffer.forEach((offer) => (offer.isActive = true)));
 
     const transportType = this._testTypePoint.filter((type) => type.eventType === nameTypeChoice);
 
@@ -681,8 +675,17 @@ export default class FormEditPointView extends SmartView {
 
   #formSelectOffers = (evt) => {
     if (evt.target.matches('input[type="checkbox"]')) {
+
       const offerId = evt.target.dataset.id;
+
+      if (evt.target.matches('input[type="checkbox"][checked]')) {
+        this.#changePrice = this._data.eventPrice - this._data.eventOffer[offerId - 1].price;
+      } else {
+        this.#changePrice = this._data.eventPrice + this._data.eventOffer[offerId - 1].price;
+      }
+
       const arrayOffers = this._data.eventOffer;
+
       if (this.#arrayId.length === 0) {
         this.#arrayId.push(offerId);
       } else {
@@ -701,9 +704,11 @@ export default class FormEditPointView extends SmartView {
         arrayOffers[offerId -1].isActive = true;
       }
 
+
       this.updateData({
         isOfferClick: offerStatusChanged,
         eventOffer: arrayOffers,
+        eventPrice: this.#changePrice,
       });
     }
   }
@@ -752,6 +757,7 @@ export default class FormEditPointView extends SmartView {
     isDisabled: false,
     isSaving: false,
     isDeleting: false,
+    isActive: false,
   })
 
   static parseDataToPoint = (data) => {
@@ -797,6 +803,7 @@ export default class FormEditPointView extends SmartView {
     delete point.isDisabled;
     delete point.isSaving;
     delete point.isDeleting;
+    delete point.isActive;
 
     return point;
   }

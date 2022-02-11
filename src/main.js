@@ -9,11 +9,9 @@ import {render, RenderPosition, remove} from './utils/render.js';
 import {MenuItem, UpdateType, FilterType} from './const.js';
 import ApiService from './api-service.js';
 
-// const TASK_COUNT = 20;
 const AUTHORIZATION = 'Basic sjliSenvDsaos8457';
 const END_POINT = 'https://16.ecmascript.pages.academy/big-trip';
 
-// const tripPoints = Array.from({length: TASK_COUNT}, generateTask).sort(compare);
 const pointsModel = new PointsModel(new ApiService(END_POINT, AUTHORIZATION));
 
 const filterModel = new FilterModel();
@@ -67,12 +65,6 @@ const handleStatsMenuClick = (menuItem) => {
   }
 };
 
-//statsMenuComponent.setStatsMenuClickHandler(handleStatsMenuClick);
-//buttonNewEvent.setButtonNewClickHandler(handleStatsMenuClick);
-
-//render(tripControlsFelter, statsMenuComponent, RenderPosition.AFTEREND);
-//render(headerMenu, buttonNewEvent, RenderPosition.BEFOREEND);
-// filterPresenter.init();
 tripPresenter.init();
 pointsModel.init().finally(() => {
 

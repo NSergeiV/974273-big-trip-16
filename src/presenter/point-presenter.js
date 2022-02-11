@@ -138,11 +138,9 @@ export default class PointPresenter {
 
     this.#changeData(
       UserAction.UPDATE_POINT,
-      isMinorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
+      isMinorUpdate ? UpdateType.MAJOR : UpdateType.MINOR,
       update,
     );
-
-    //this.#replaceFormToCard();
   }
 
   #handleDeleteClick = (point) => {
